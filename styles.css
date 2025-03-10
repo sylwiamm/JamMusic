@@ -161,6 +161,7 @@ svg {
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 5;
 }
 
 /* Calendar specific styles */
@@ -201,4 +202,66 @@ svg {
   z-index: 10;
   font-family: 'Fira Mono', monospace;
   transform: translateY(-72%);
+}
+
+/* Container for connections */
+#connections-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Map SVG z-index */
+#mapSvg {
+  z-index: 5;
+}
+
+/* Names container */
+.names-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 100%;
+  z-index: 20;
+  position: relative;
+  pointer-events: auto;
+}
+
+/* Person name styling */
+.person-name {
+  margin: 5px 10px;
+  text-align: center;
+  font-size: 12px;
+  cursor: pointer;
+  max-width: 100px;
+  transition: transform 0.2s;
+  pointer-events: auto;
+}
+
+/* Person name text color */
+.person-name span {
+  color: #ffffff;
+}
+
+/* Connection SVG */
+#connections-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 15;
+}
+
+/* Connection path default state */
+.connection {
+  fill: none;
+  stroke-width: 0.5;
+  opacity: 0.1;
+  transition: opacity 0.2s, stroke-width 0.2s;
 }
