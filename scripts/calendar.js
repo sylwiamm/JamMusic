@@ -1,7 +1,8 @@
 // Function to create calendar heatmap
 function createCalendarHeatmap(data) {
 
-  d3.select("calendar-container").remove();
+  // Remove the previously rendered calendar SVG if it exists
+  d3.select("#calendar svg").remove();
 
   // Validate and clean date entries
   const validData = data.filter(d => {
