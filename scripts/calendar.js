@@ -120,15 +120,13 @@ function createCalendarHeatmap(data) {
     .attr("x", d => {
       // Calculate the week number
       const dayOfYear = d3.timeDay.count(d3.timeYear(d), d);
-      const weekNum = Math.floor((dayOfYear + firstDayOffset) / 7);
+      const weekNum = Math.floor((dayOfYear + (firstDayOffset - 1)) / 7);
       return weekNum * (cellSize + cellMargin);
     })
     .attr("y", d => {
       // Get the day of week (0 = Sunday, 1 = Monday, etc.)
       let dayOfWeek = d.getDay() || 7; // Convert Sunday from 0 to 7
-      dayOfWeek = dayOfWeek - 1; // Adjust to 0-indexed for Monday first
-      if (dayOfWeek < 0) dayOfWeek = 6; // Sunday becomes the last day
-      return dayOfWeek * (cellSize + cellMargin);
+      return (dayOfWeek-1) * (cellSize + cellMargin);
     })
     .attr("fill", d => {
       const dateStr = formatDate(d);
