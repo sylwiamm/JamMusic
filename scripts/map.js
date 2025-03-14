@@ -1,4 +1,4 @@
-function drawMap(width, height) {
+function drawMap(width, height, csvData) {
   // Define margins
   const margin = {
     top: 125,
@@ -36,80 +36,72 @@ function drawMap(width, height) {
       const projection = d3.geoNaturalEarth1()
         .fitSize([innerWidth, innerHeight], {type: "Sphere"});
 
-      d3.csv("data/events.csv")
-        .then(function(csvData) {
-          if (!csvData || csvData.length === 0) {
-            console.warn("CSV data is empty:", csvData);
-            return;
-          }
+      if (!csvData || csvData.length === 0) {
+        console.warn("CSV data is empty:", csvData);
+        return;
+      }
 
-          console.log("CSV data loaded successfully:", csvData);
+      console.log("CSV data loaded successfully:", csvData);
 
-          createCalendarHeatmap(csvData);
+      // Process CSV data
+      try {
+        // Check if CSV has the expected columns
+        const firstRow = csvData[0];
+        if (!firstRow.hasOwnProperty('latitude') || !firstRow.hasOwnProperty('longitude') ||
+            !firstRow.hasOwnProperty('city') || !firstRow.hasOwnProperty('country')) {
+          console.error("CSV missing required columns. Expected: latitude, longitude, city, country");
+          console.log("Available columns:", Object.keys(firstRow));
 
-          // Process CSV data
-          try {
-            // Check if CSV has the expected columns
-            const firstRow = csvData[0];
-            if (!firstRow.hasOwnProperty('latitude') || !firstRow.hasOwnProperty('longitude') ||
-                !firstRow.hasOwnProperty('city') || !firstRow.hasOwnProperty('country')) {
-              console.error("CSV missing required columns. Expected: latitude, longitude, city, country");
-              console.log("Available columns:", Object.keys(firstRow));
+          // List all available columns
+          const availableColumns = Object.keys(firstRow).join(", ");
+          svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", 80)
+            .attr("text-anchor", "middle")
+            .text(`Available columns: ${availableColumns}`);
 
-              // List all available columns
-              const availableColumns = Object.keys(firstRow).join(", ");
-              svg.append("text")
-                .attr("x", width / 2)
-                .attr("y", 80)
-                .attr("text-anchor", "middle")
-                .text(`Available columns: ${availableColumns}`);
+          return;
+        }
 
-              return;
-            }
+        const cityData = processCSVData(csvData);
 
-            const cityData = processCSVData(csvData);
-            console.log("Processed city data:", cityData);
+        if (cityData.length === 0) {
+          console.log("No valid city data found in CSV.");
+          return;
+        }
 
-            if (cityData.length === 0) {
-              console.log("No valid city data found in CSV.");
-              return;
-            }
+        // Define bubble size scale
+        const bubbleScale = d3.scaleSqrt()
+          .domain([1, d3.max(cityData, d => d.count) || 10])
+          .range([4, 15]); // Min and max radius
 
-            console.log(`Displaying ${cityData.length} cities from CSV...`);
+        // Add city bubbles
+        const cities = mapGroup.selectAll(".city-bubble")
+          .data(cityData)
+          .enter()
+          .append("g")
+          .attr("class", "city-group");
 
-            // Define bubble size scale
-            const bubbleScale = d3.scaleSqrt()
-              .domain([1, d3.max(cityData, d => d.count) || 10])
-              .range([4, 15]); // Min and max radius
+        // Draw city bubbles
+        cities.append("circle")
+          .attr("class", "city-bubble")
+          .attr("cx", d => {
+            const coords = projection([d.longitude, d.latitude]);
+            console.log(`City: ${d.city}, Longitude: ${d.longitude}, Latitude: ${d.latitude}, Projected coords:`, coords);
+            return coords ? coords[0] : 0;
+          })
+          .attr("cy", d => {
+            const coords = projection([d.longitude, d.latitude]);
+            return coords ? coords[1] : 0;
+          })
+          .attr("r", d => bubbleScale(d.count));
 
-            // Add city bubbles
-            const cities = mapGroup.selectAll(".city-bubble")
-              .data(cityData)
-              .enter()
-              .append("g")
-              .attr("class", "city-group");
+        createNameConnections(csvData, projection);
 
-            // Draw city bubbles
-            cities.append("circle")
-              .attr("class", "city-bubble")
-              .attr("cx", d => {
-                const coords = projection([d.longitude, d.latitude]);
-                console.log(`City: ${d.city}, Longitude: ${d.longitude}, Latitude: ${d.latitude}, Projected coords:`, coords);
-                return coords ? coords[0] : 0;
-              })
-              .attr("cy", d => {
-                const coords = projection([d.longitude, d.latitude]);
-                return coords ? coords[1] : 0;
-              })
-              .attr("r", d => bubbleScale(d.count));
+      } catch (err) {
+        console.error("Error processing CSV data:", err);
+      }
 
-          } catch (err) {
-            console.error("Error processing CSV data:", err);
-          }
-        })
-        .catch(function(error) {
-          console.error("Error loading CSV data:", error);
-        });
     })
     .catch(function(error) {
       console.error("Error loading world data:", error);
@@ -128,7 +120,7 @@ function processCSVData(csvData) {
     try {
       // Handle missing values
       if (!d.latitude || !d.longitude || !d.city || !d.country) {
-        console.warn("Row missing required data:", d);
+        console.log("Row missing required data:", d);
         d.valid = false;
         return;
       }
@@ -177,7 +169,7 @@ function processCSVData(csvData) {
   // Filter out any rows with invalid coordinates
   const validData = processedData.filter(d => {
     const valid = d.valid && !isNaN(d.latitude) && !isNaN(d.longitude);
-    if (!valid) console.warn("Filtering out invalid row:", d);
+    if (!valid) console.log("Filtering out invalid row:", d);
     return valid;
   });
 
@@ -254,9 +246,3 @@ function generateDotPattern(width, height, world) {
 
   return points;
 }
-
-
-// Export the functions
-window.drawMap = drawMap;
-window.processCSVData = processCSVData;
-window.generateDotPattern = generateDotPattern;

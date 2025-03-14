@@ -1,5 +1,7 @@
-// Function to create name-to-location connections with improved debugging
-function createNameConnections(csvData, mapSvg) {
+// Function to create name - bubble connections in a form of brezier curves
+function createNameConnections(csvData, projection) {
+  d3.select("#connections-container").remove();
+  d3.select("#connections-svg").remove();
   console.log("Starting createNameConnections with data:", csvData.length);
 
   if (!csvData || csvData.length === 0) {
@@ -19,23 +21,9 @@ function createNameConnections(csvData, mapSvg) {
     left: -50
   };
 
-  // Clear any existing connections first
-  d3.select("#connections-container").remove();
-  d3.select("#connections-svg").remove();
-
-  // Create or select dedicated container for connections
   let connectionsContainer = d3.select(".container")
     .append("div")
-    .attr("id", "connections-container")
-    .style("position", "absolute")
-    .style("top", "0")
-    .style("left", "0")
-    .style("width", "100%")
-    .style("height", "100%")
-    .style("pointer-events", "none")
-    .style("z-index", "10");
-
-  console.log("Created new connections container");
+    .attr("id", "connections-container");
 
   // Create a names container
   const namesContainer = connectionsContainer
@@ -87,49 +75,48 @@ function createNameConnections(csvData, mapSvg) {
 
   console.log("Processed data:", peopleMap.size, "people with locations");
 
-  // Set up the projection to match the map
-  const projection = d3.geoNaturalEarth1()
-    .fitSize([width, height], {type: "Sphere"});
-
   // Create a dedicated SVG just for the connections
   const connectionsSvg = connectionsContainer
     .append("svg")
     .attr("id", "connections-svg")
     .attr("width", width)
-    .attr("height", height)
-    .style("position", "absolute")
-    .style("top", "0")
-    .style("left", "0")
-    .style("z-index", "15");
+    .attr("height", height);
 
   // Create the lines layer
   const linesLayer = connectionsSvg
     .append("g")
     .attr("class", "connections-layer");
 
+  // Create a mapping between person names and safe names for consistency
+  const nameToSafeNameMap = new Map();
+
+  peopleMap.forEach((person, name) => {
+    const safeName = name.replace(/\s+/g, '-').toLowerCase().replace(/[^\w-]/g, '');
+    nameToSafeNameMap.set(name, safeName);
+  });
 
   // Add names and prepare for connecting to locations
   const nameElements = namesContainer.selectAll(".person-name")
     .data(Array.from(peopleMap.values()))
     .enter()
     .append("div")
-    .attr("class", d => `person-name person-${d.name.replace(/\s+/g, '-').replace(/[^\w-]/g, '')}`)
+    .attr("class", d => `person-name person-${nameToSafeNameMap.get(d.name)}`)
+    .attr("data-person", d => nameToSafeNameMap.get(d.name))  // Add data attribute for direct access
     .html(d => `<span style="color:#ffffff">${d.name}</span>`);
 
-
-  // Use a longer timeout to ensure DOM is fully rendered
+  // Wait for the DOM to be updated
   setTimeout(() => {
-    console.log("Drawing connections after timeout");
-
     // Draw connections after names are rendered
     peopleMap.forEach((person, name) => {
-      const safeName = person.name.replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+      const safeName = nameToSafeNameMap.get(name);
       const nameElement = document.querySelector(`.person-${safeName}`);
 
       if (!nameElement) {
-        console.warn(`Could not find element for ${person.name} (class: .person-${safeName})`);
+        console.warn(`Could not find element for ${name} (class: .person-${safeName})`);
         return;
       }
+
+      console.log(`Processing person: ${name}, safeName: ${safeName}`);
 
       // Get positions
       const nameRect = nameElement.getBoundingClientRect();
@@ -137,7 +124,6 @@ function createNameConnections(csvData, mapSvg) {
 
       const sourceX = nameRect.left + nameRect.width/2 - containerRect.left;
       const sourceY = nameRect.bottom - containerRect.top;
-
 
       // Create a line for each location
       person.locations.forEach(location => {
@@ -149,9 +135,7 @@ function createNameConnections(csvData, mapSvg) {
 
         // Apply map margins to the target coordinates
         const targetX = targetCoords[0] + margin.left;
-        const targetY = targetCoords[1] + margin.top; // Adjust for vertical spacing and top margin
-
-        console.log(`Location ${location.city} at position:`, targetX, targetY);
+        const targetY = targetCoords[1] + margin.top;
 
         // Calculate control points for the bezier curve
         const controlX1 = sourceX;
@@ -165,46 +149,51 @@ function createNameConnections(csvData, mapSvg) {
           .attr("d", `M${sourceX},${sourceY} C${controlX1},${controlY1} ${controlX2},${controlY2} ${targetX},${targetY}`)
           .attr("fill", "none")
           .attr("stroke", instrumentColors.get(person.instrument))
-          .attr("stroke-width", "0.5px")
-          .attr("opacity", "0.1");
       });
     });
 
-    // After all connections are drawn, add the event listeners
+    // Now add the event listeners
     document.querySelectorAll('.person-name').forEach(el => {
-      const className = el.className;
-      const personClass = className.split(' ')
-        .find(cls => cls.startsWith('person-'))
-        ?.substring(7);
+      // Use the data attribute directly - KEY FIX
+      const personClass = el.getAttribute('data-person');
 
-      if (!personClass) {
-        console.warn("Could not extract person class from:", className);
-        return;
-      }
+      console.log(`Adding listeners for ${personClass}`);
+
+      // Check if this person has any connections
+      const personConnections = document.querySelectorAll(`.connection-${personClass}`).length;
+      console.log(`${personClass} has ${personConnections} connections`);
 
       // Mouseover event
-      el.addEventListener('mouseover', () => {
-        // Scale up the name
-        el.style.transform = 'scale(1.1)';
+      el.addEventListener('mouseover', function() {
+        console.log(`Mouseover on ${personClass}`);
 
-        // Find and highlight only this person's connections
-        document.querySelectorAll(`.connection-${personClass}`).forEach(path => {
-            path.setAttribute("opacity", "1");
-            path.setAttribute("stroke-width", "2.5px");
+        // Scale up the name
+        this.style.transform = 'scale(1.1)';
+
+        // Try to highlight connections
+        const connections = document.querySelectorAll(`.connection-${personClass}`);
+        console.log(`Found ${connections.length} connections to highlight for ${personClass}`);
+
+        connections.forEach(path => {
+          path.style.opacity = '0.9';
+          path.style.strokeWidth = '2px';
         });
       });
 
       // Mouseout event
-      el.addEventListener('mouseout', () => {
-        // Scale back the name
-        el.style.transform = 'scale(1)';
+      el.addEventListener('mouseout', function() {
+        console.log(`Mouseout on ${personClass}`);
 
-        // Reset this person's connections
-        document.querySelectorAll(`.connection-${personClass}`).forEach(path => {
-          path.style.opacity = '0.1';
+        // Scale back the name
+        this.style.transform = 'scale(1)';
+
+        // Reset connections
+        const connections = document.querySelectorAll(`.connection-${personClass}`);
+        connections.forEach(path => {
+          path.style.opacity = '0.15';
           path.style.strokeWidth = '0.5px';
         });
       });
     });
-  }, 100); // Longer timeout for more reliable rendering
+  }, 500);
 }

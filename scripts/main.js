@@ -6,21 +6,22 @@ function initializeVisualization() {
 
   // Clear any existing visualization
   d3.select("#mapSvg").html("");
+  // These are repeated in individual scripts too
+  d3.select("#calendar svg").remove();
+  d3.select("#connections-container").remove();
   d3.select("#connections-svg").remove();
 
-  // Set dimensions
+  // Set map dimensions
   d3.select("#mapSvg")
     .attr("width", width)
     .attr("height", height);
 
-  // Draw the map first
-  drawMap(width, height);
-
-  // Load the data and create connections
+  // Load the data
   d3.csv("data/events.csv")
     .then(function(csvData) {
       console.log("CSV data loaded:", csvData.length, "rows");
-      createNameConnections(csvData, d3.select("#mapSvg"));
+      drawMap(width, height, csvData);
+      createCalendarHeatmap(csvData);
     })
     .catch(function(error) {
       console.error("Error loading CSV data:", error);

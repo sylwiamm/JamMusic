@@ -215,7 +215,7 @@ svg {
   z-index: 10;
 }
 
-/* Map SVG z-index */
+/* Map SVG z-index to make sure that it appears below other viz */
 #mapSvg {
   z-index: 5;
 }
@@ -245,11 +245,6 @@ svg {
   pointer-events: auto;
 }
 
-/* Person name text color */
-.person-name span {
-  color: #ffffff;
-}
-
 /* Connection SVG */
 #connections-svg {
   position: absolute;
@@ -262,6 +257,6 @@ svg {
 .connection {
   fill: none;
   stroke-width: 0.5;
-  opacity: 0.1;
+  opacity: 0.15;
   transition: opacity 0.2s, stroke-width 0.2s;
 }

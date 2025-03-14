@@ -1,6 +1,5 @@
 // Function to create calendar heatmap
 function createCalendarHeatmap(data) {
-
   d3.select("#calendar svg").remove();
 
   // Validate and clean date entries
@@ -45,7 +44,7 @@ function createCalendarHeatmap(data) {
   const firstDayOfYear = new Date(year, 0, 1);
   const firstDayOffset = firstDayOfYear.getDay();
 
-  // Color scale - using white with varying opacity for dark theme
+  // Color scale
   const maxCount = d3.max(Object.values(dateCount)) || 1;
   const colorScale = d3.scaleSequential()
     .domain([0, maxCount])
@@ -191,5 +190,3 @@ function createCalendarHeatmap(data) {
       .text("No performance data for 2024");
   }
 }
-
-window.createCalendarHeatmap = createCalendarHeatmap
