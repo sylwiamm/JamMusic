@@ -146,7 +146,7 @@ Thomas Hechenberger,Gitarre,2024-09-06,Kaiserslautern,Germany,49.4401,7.7491
 Thomas Hechenberger,Gitarre,2024-07-29,Graz,Austria,47.0679,15.4417
 Herbert Mayer,Harmonica,2024-09-08,Vienna,Austria,48.2081,16.3713
 Agnes Haider,,2024-09-29,Kirchberg am Wagram,Austria,48.4320,15.8975
-Richard Graf,Theorie-Arrangement-Komposition-Gitarre,Unknown,Vienna,Austria,48.2081,16.3713
+Richard Graf,Theorie-Arrangement-Komposition-Gitarre,,Vienna,Austria,48.2081,16.3713
 Julia Hofer,Bass,2024-09-24,Köln,Germany,50.9375,6.9603
 Thomas Gansch,Trompete,2024-10-28,Vienna,Austria,48.2081,16.3713
 Thomas Hechenberger,Gitarre,2024-10-09,Vienna,Austria,48.2081,16.3713
@@ -230,7 +230,7 @@ Richard Graf,Theorie-Arrangement-Komposition-Gitarre,2024-10-12,Regensburg,Germa
 Peter Gabis,Schlagzeug,2024-11-08,Reichenau an der Rax,Austria,47.6984,15.8351
 Thomas Mora,Bass,2024-12-29,Vienna,Austria,48.2081,16.3713
 Thomas Gansch,Trompete,2024-12-06,Benken,Switzerland,47.1984,9.0051
-Julia Hofer,Bass,Unknown,Vienna,Austria,48.2081,16.3713
+Julia Hofer,Bass,,Vienna,Austria,48.2081,16.3713
 Maja Jakupovic,Gesang,2024-12-19,Vienna,Austria,48.2081,16.3713
 Monika Herzig,Klavier,2024-12-18,Noblesville,United States of America,40.0456,-86.0086
 Monika Herzig,Klavier,2024-12-28,Noblesville,United States of America,40.0456,-86.0086
@@ -326,6 +326,6 @@ Thomas Hechenberger,Gitarre,2024-11-01,Salzburg,Austria,47.8014,13.0448
 Christian Havel,Gitarre,2024-07-31,Vienna,Austria,48.2081,16.3713
 Christian Havel,Gitarre,2024-09-04,Vienna,Austria,48.2081,16.3713
 Monika Herzig,Klavier,2024-09-16,Vienna,Austria,48.2081,16.3713
-Yu-Chun Huang,Media Music,Unknown,,,,
+Yu-Chun Huang,Media Music,,,,,
 Bamdad Khoshghadami Hosseini,Composition And Music Theory,2024-11-10,,,,
 Bamdad Khoshghadami Hosseini,Composition And Music Theory,2024-07-01,,,,
