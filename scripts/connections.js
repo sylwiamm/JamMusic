@@ -1,4 +1,3 @@
-// Function to create name - bubble connections in a form of brezier curves
 function createNameConnections(csvData, projection) {
   d3.select("#connections-container").remove();
   d3.select("#connections-svg").remove();
@@ -96,13 +95,47 @@ function createNameConnections(csvData, projection) {
   });
 
   // Add names and prepare for connecting to locations
-  const nameElements = namesContainer.selectAll(".person-name")
-    .data(Array.from(peopleMap.values()))
-    .enter()
-    .append("div")
-    .attr("class", d => `person-name person-${nameToSafeNameMap.get(d.name)}`)
-    .attr("data-person", d => nameToSafeNameMap.get(d.name))  // Add data attribute for direct access
-    .html(d => `<span style="color:#ffffff">${d.name}</span>`);
+  namesContainer.selectAll(".person-name")
+  .data(Array.from(peopleMap.values()))
+  .enter()
+  .append("div")
+  .attr("class", d => `person-name person-${nameToSafeNameMap.get(d.name)}`)
+  .attr("data-person", d => nameToSafeNameMap.get(d.name))
+  .html(d => `<span style="color:#ffffff">${d.name}</span>`);
+
+  // Create a map to store location coordinates by person
+  const personToLocations = new Map();
+
+  // Cache city bubbles for better performance
+  const cityBubbleCache = [];
+
+  // Find and cache all city bubbles and their original states
+  d3.selectAll(".city-bubble").each(function(d) {
+    if (!d) return;
+
+    const element = d3.select(this);
+    cityBubbleCache.push({
+      element: element,
+      node: this,
+      data: d,
+      originalFill: element.style("fill") || element.attr("fill") || "#555",
+      originalOpacity: element.style("opacity") || element.attr("opacity") || "1"
+    });
+  });
+
+  console.log(`Cached ${cityBubbleCache.length} city bubbles`);
+
+  // Store a reference to all bubbles by coordinates for quick lookup
+  const bubblesByCoords = new Map();
+  cityBubbleCache.forEach(bubble => {
+    if (!bubble.data) return;
+
+    const key = `${bubble.data.longitude}-${bubble.data.latitude}`;
+    if (!bubblesByCoords.has(key)) {
+      bubblesByCoords.set(key, []);
+    }
+    bubblesByCoords.get(key).push(bubble);
+  });
 
   // Wait for the DOM to be updated
   setTimeout(() => {
@@ -118,6 +151,11 @@ function createNameConnections(csvData, projection) {
 
       console.log(`Processing person: ${name}, safeName: ${safeName}`);
 
+      // Keep track of this person's locations
+      if (!personToLocations.has(name)) {
+        personToLocations.set(name, []);
+      }
+
       // Get positions
       const nameRect = nameElement.getBoundingClientRect();
       const containerRect = connectionsContainer.node().getBoundingClientRect();
@@ -132,6 +170,12 @@ function createNameConnections(csvData, projection) {
           console.warn(`Could not project coordinates for ${location.city}`);
           return;
         }
+
+        // Store this location for this person for filtering later
+        personToLocations.get(name).push({
+          latitude: location.latitude,
+          longitude: location.longitude
+        });
 
         // Apply map margins to the target coordinates
         const targetX = targetCoords[0] + margin.left;
@@ -149,28 +193,35 @@ function createNameConnections(csvData, projection) {
           .attr("d", `M${sourceX},${sourceY} C${controlX1},${controlY1} ${controlX2},${controlY2} ${targetX},${targetY}`)
           .attr("fill", "none")
           .attr("stroke", instrumentColors.get(person.instrument))
+          .attr("opacity", "0.15")
+          .attr("stroke-width", "0.5px");
       });
     });
 
     // Now add the event listeners
     document.querySelectorAll('.person-name').forEach(el => {
-      // Use the data attribute directly - KEY FIX
       const personClass = el.getAttribute('data-person');
+      const personName = el.textContent.trim();
+      const personData = peopleMap.get(personName);
+
+      if (!personData) {
+        console.warn(`Could not find data for person: ${personName}`);
+        return;
+      }
+
+      const personInstrument = personData.instrument;
+      const personColor = instrumentColors.get(personInstrument);
 
       console.log(`Adding listeners for ${personClass}`);
 
-      // Check if this person has any connections
-      const personConnections = document.querySelectorAll(`.connection-${personClass}`).length;
-      console.log(`${personClass} has ${personConnections} connections`);
-
-      // Mouseover event
+      // Mouseover event - filter to show only this person's bubbles
       el.addEventListener('mouseover', function() {
         console.log(`Mouseover on ${personClass}`);
 
         // Scale up the name
         this.style.transform = 'scale(1.1)';
 
-        // Try to highlight connections
+        // Highlight connections
         const connections = document.querySelectorAll(`.connection-${personClass}`);
         console.log(`Found ${connections.length} connections to highlight for ${personClass}`);
 
@@ -178,9 +229,32 @@ function createNameConnections(csvData, projection) {
           path.style.opacity = '0.9';
           path.style.strokeWidth = '2px';
         });
+
+        // Get this person's locations
+        const personLocations = personToLocations.get(personName) || [];
+
+        // First hide all bubbles
+        cityBubbleCache.forEach(bubble => {
+          bubble.element.style("opacity", "0.1");
+        });
+
+        // Then only highlight this person's bubbles
+        personLocations.forEach(location => {
+          const locationKey = `${location.longitude}-${location.latitude}`;
+          const matchingBubbles = bubblesByCoords.get(locationKey);
+
+          if (matchingBubbles && matchingBubbles.length > 0) {
+            matchingBubbles.forEach(bubble => {
+              // Set color and make fully visible
+              bubble.element.style("fill", personColor);
+              bubble.element.style("stroke", personColor);
+              bubble.element.style("opacity", "1");
+            });
+          }
+        });
       });
 
-      // Mouseout event
+      // Mouseout event - restore all bubbles
       el.addEventListener('mouseout', function() {
         console.log(`Mouseout on ${personClass}`);
 
@@ -192,6 +266,13 @@ function createNameConnections(csvData, projection) {
         connections.forEach(path => {
           path.style.opacity = '0.15';
           path.style.strokeWidth = '0.5px';
+        });
+
+        // Reset all city bubbles to original state
+        cityBubbleCache.forEach(bubble => {
+          bubble.element.style("fill", bubble.originalFill);
+          bubble.element.style("stroke", bubble.originalFill);
+          bubble.element.style("opacity", bubble.originalOpacity);
         });
       });
     });
