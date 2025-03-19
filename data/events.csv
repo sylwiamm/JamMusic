@@ -71,7 +71,7 @@ Thomas Hechenberger,Gitarre,2024-08-20,Tulln an der Donau,Austria,48.3315,16.060
 Wolfgang Luckner,Schlagzeug,2024-08-08,Tulln an der Donau,Austria,48.3315,16.0607,Schlaginstrumente,Percussion,Drums
 Wolfgang Luckner,Schlagzeug,2024-08-09,Tulln an der Donau,Austria,48.3315,16.0607,Schlaginstrumente,Percussion,Drums
 Dusan Simovic,Bass,2024-10-05,Vienna,Austria,48.2081,16.3713,Saiteninstrumente,Strings,Bass
-Agnes Haider,,2024-10-05,Vienna,Austria,48.2081,16.3713,,,
+Agnes Haider,Klavier,2024-10-05,Vienna,Austria,48.2081,16.3713,Tasteninstrument,Keyboard,Piano
 Monika Herzig,Klavier,2024-08-14,Indianapolis,United States of America,39.7691,-86.158,Tasteninstrument,Keyboard,Piano
 Richard Graf,Theorie-Arrangement-Komposition-Gitarre,2024-10-14,Vienna,Austria,48.2081,16.3713,Saiteninstrumente,Strings,Theory-Arrangement-Composition-Guitar
 Christof Unterberger,Medienmusik,2024-09-03,Eisenstadt,Austria,47.8405,16.5252,Medienmusik,Media Music,Media Music
@@ -145,7 +145,7 @@ Wolfgang Luckner,Schlagzeug,2024-08-31,Admont,Austria,47.5729,14.4615,Schlaginst
 Thomas Hechenberger,Gitarre,2024-09-06,Kaiserslautern,Germany,49.4401,7.7491,Saiteninstrumente,Strings,Guitar
 Thomas Hechenberger,Gitarre,2024-07-29,Graz,Austria,47.0679,15.4417,Saiteninstrumente,Strings,Guitar
 Herbert Mayer,Harmonica,2024-09-08,Vienna,Austria,48.2081,16.3713,Holzblasinstrumente,Woodwind,Harmonica
-Agnes Haider,,2024-09-29,Kirchberg am Wagram,Austria,48.432,15.8975,,,
+Agnes Haider,Klavier,2024-09-29,Kirchberg am Wagram,Austria,48.432,15.8975,Tasteninstrument,Keyboard,Piano
 Richard Graf,Theorie-Arrangement-Komposition-Gitarre,,Vienna,Austria,48.2081,16.3713,Saiteninstrumente,Strings,Theory-Arrangement-Composition-Guitar
 Julia Hofer,Bass,2024-09-24,Köln,Germany,50.9375,6.9603,Saiteninstrumente,Strings,Bass
 Thomas Gansch,Trompete,2024-10-28,Vienna,Austria,48.2081,16.3713,Blechblasinstrumente,Brass,Trumpet
@@ -253,7 +253,7 @@ Thomas Hechenberger,Gitarre,2024-08-09,Sonntag,Austria,47.2379,9.8992,Saiteninst
 Peter Gabis,Schlagzeug,2024-06-19,Vienna,Austria,48.2081,16.3713,Schlaginstrumente,Percussion,Drums
 Monika Herzig,Klavier,2024-09-20,Vienna,Austria,48.2081,16.3713,Tasteninstrument,Keyboard,Piano
 Bamdad Khoshghadami Hosseini,Composition And Music Theory,2024-05-31,Vienna,Austria,48.2081,16.3713,Komposition und Musiktheorie,Composition & Theory,Composition And Music Theory
-Agnes Haider,,2024-08-21,Sankt Florian,Austria,48.2051,14.3779,,,
+Agnes Haider,Klavier,2024-08-21,Sankt Florian,Austria,48.2051,14.3779,Tasteninstrument,Keyboard,Piano
 Oliver Schmellenkamp,Media Music,2024-12-01,St. Pölten,Austria,48.2058,15.6307,Medienmusik,Media Music,Media Music
 Thomas Hechenberger,Gitarre,2024-11-07,Vienna,Austria,48.2081,16.3713,Saiteninstrumente,Strings,Guitar
 Engel Mayr,Gitarre,2024-07-06,Braden,Germany,48.7656,8.2285,Saiteninstrumente,Strings,Guitar
