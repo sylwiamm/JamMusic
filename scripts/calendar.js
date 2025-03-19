@@ -149,7 +149,7 @@ function createCalendarHeatmap(data) {
       if (eventsOnDate.length > 0) {
         tooltipContent += `Events: ${eventsOnDate.length}<br><br>`;
         eventsOnDate.forEach(event => {
-          tooltipContent += `${event.full_name} (${event.instrument})<br>`;
+          tooltipContent += `${event.full_name} (${event.instrument_english})<br>`;
           tooltipContent += `${event.city}, ${event.country}<br><br>`;
         });
       } else {

@@ -31,14 +31,14 @@ function createNameConnections(csvData, projection) {
 
   // Process the data to group by full_name
   const peopleMap = new Map();
-  const instrumentColors = new Map();
+  const instrumentFamilyColors = new Map();
   let colorIndex = 0;
 
-  // Color palette for different instruments
+  // Color palette for different instrument family
   const colors = [
-    "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
-    "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22",
-    "#17becf", "#aec7e8", "#ffbb78", "#98df8a"
+    "#ea5d28", "#2b5ba7", "#9ad0d0",
+    "#c60204", "#fdca01", "#d84162",
+    "#5eb300", "#692673", "#d6d96d"
   ];
 
   // Group data by person and collect their locations
@@ -48,17 +48,20 @@ function createNameConnections(csvData, projection) {
       return;
     }
 
-    // Assign color to instrument if not already assigned
-    if (!instrumentColors.has(d.instrument)) {
-      instrumentColors.set(d.instrument, colors[colorIndex % colors.length]);
-      colorIndex++;
+    if (!instrumentFamilyColors.has(d.instrument_family_english)) {
+      if (d.instrument_family_english === "") {
+        instrumentFamilyColors.set(d.instrument_family_english, "#DDDDDD"); // assign pale grey for nan
+      } else {
+        instrumentFamilyColors.set(d.instrument_family_english, colors[colorIndex % colors.length]);
+        colorIndex++;
+      }
     }
 
     const personKey = d.full_name;
     if (!peopleMap.has(personKey)) {
       peopleMap.set(personKey, {
         name: d.full_name,
-        instrument: d.instrument,
+        instrument_family: d.instrument_family_english,
         locations: []
       });
     }
@@ -192,7 +195,7 @@ function createNameConnections(csvData, projection) {
           .attr("class", `connection connection-${safeName}`)
           .attr("d", `M${sourceX},${sourceY} C${controlX1},${controlY1} ${controlX2},${controlY2} ${targetX},${targetY}`)
           .attr("fill", "none")
-          .attr("stroke", instrumentColors.get(person.instrument))
+          .attr("stroke", instrumentFamilyColors.get(person.instrument_family))
           .attr("opacity", "0.15")
           .attr("stroke-width", "0.5px");
       });
@@ -209,8 +212,7 @@ function createNameConnections(csvData, projection) {
         return;
       }
 
-      const personInstrument = personData.instrument;
-      const personColor = instrumentColors.get(personInstrument);
+      const personColor = instrumentFamilyColors.get(personData.instrument_family);
 
       console.log(`Adding listeners for ${personClass}`);
 
