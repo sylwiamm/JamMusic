@@ -1,5 +1,5 @@
 // Function to create calendar heatmap
-function createCalendarHeatmap(data) {
+function createCalendarHeatmap(data, heatmap_color = "FFFFFF") {
   d3.select("#calendar svg").remove();
 
   // Validate and clean date entries
@@ -44,11 +44,18 @@ function createCalendarHeatmap(data) {
   const firstDayOfYear = new Date(year, 0, 1);
   const firstDayOffset = firstDayOfYear.getDay();
 
+  // Prepare color for heatmap
+  heatmap_color = heatmap_color.replace(/^#/, '');
+  // Parse the r, g, b values
+  let r = parseInt(heatmap_color.substring(0, 2), 16);
+  let g = parseInt(heatmap_color.substring(2, 4), 16);
+  let b = parseInt(heatmap_color.substring(4, 6), 16);
+
   // Color scale
   const maxCount = d3.max(Object.values(dateCount)) || 1;
   const colorScale = d3.scaleSequential()
     .domain([0, maxCount])
-    .interpolator(d => `rgba(255, 255, 255, ${d/maxCount * 20 + 0.2})`);  // White with opacity
+    .interpolator(d => `rgba(${r}, ${g}, ${b}, ${d/maxCount * 20 + 0.2})`);
 
   // Create the SVG element
   const svg = d3.select("#calendar")
