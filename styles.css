@@ -290,11 +290,6 @@ svg {
   background-color: rgba(26, 26, 26, 0.7);
 }
 
-.summary-box {
-   padding: 0px;
-   margin: 0px 2px;
- }
-
 .summary-columns {
   display: flex;
   justify-content: space-between;
