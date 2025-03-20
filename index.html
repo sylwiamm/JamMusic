@@ -52,6 +52,25 @@
       <div id="calendar"></div>
     </div>
     <svg id="mapSvg"></svg>
+    <div id="summary-container" class="summary-box">
+      <div class="summary-columns">
+        <div class="summary-column">
+          <div class="summary-number" id="event-count">0</div>
+          <div class="summary-description">Events</div>
+        </div>
+        <div class="summary-column">
+          <div class="summary-number" id="city-count">0</div>
+          <div class="summary-description">Cities</div>
+        </div>
+        <div class="summary-column">
+          <div class="summary-number" id="country-count">0</div>
+          <div class="summary-description">Countries</div>
+        </div>
+      </div>
+      <div class="summary-additional">
+        <p id="additional-info">Additional information will be placed here later.</p>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -60,5 +79,6 @@
   <script src="scripts/map.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/connections.js"></script>
+  <script src="scripts/summary.js"></script>
 </body>
 </html>

@@ -20,7 +20,7 @@ h1 {
   left: 20px;
   color: #fff; /* Light text color */
   margin: 0;
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
   z-index: 10;
   text-decoration: underline;
@@ -204,6 +204,7 @@ svg {
   z-index: 10;
   background-color: #1a1a1a80;
 }
+
 .tooltip {
   position: absolute;
   padding: 10px;
@@ -274,4 +275,52 @@ svg {
   stroke-width: 0.5;
   opacity: 0.15;
   transition: opacity 0.2s, stroke-width 0.2s;
+}
+
+/* Summary statistics container */
+#summary-container {
+  position: absolute;
+  top: 20%;
+  left: 85%;
+  width: 15%;
+  height: auto;
+  z-index: 10;
+  pointer-events: none;
+  background-color: rgba(26, 26, 26, 0.7);
+}
+
+.summary-box {
+  padding: 0px;
+  margin: 0px 2px;
+}
+
+.summary-columns {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.summary-column {
+  flex: 1;
+  text-align: center;
+  padding: 0 15px;
+}
+
+.summary-number {
+  font-size: 30px;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 5px;
+}
+
+.summary-description {
+  font-size: 12px;
+  color: #FFFFFF;
+}
+
+.summary-additional {
+  border-top: 1px solid #eee;
+  padding-top: 5px;
+  font-size: 12px;
+  color: #FFFFFF;
 }

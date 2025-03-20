@@ -22,6 +22,7 @@ function initializeVisualization() {
       console.log("CSV data loaded:", csvData.length, "rows");
       drawMap(width, height, csvData);
       createCalendarHeatmap(csvData);
+      updateSummary(csvData);
     })
     .catch(function(error) {
       console.error("Error loading CSV data:", error);

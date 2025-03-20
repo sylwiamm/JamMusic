@@ -258,6 +258,7 @@ function createNameConnections(csvData, projection) {
         // Update calendar to show per person events
         const calendarData = csvData.filter(row => row["full_name"] === personName);
         createCalendarHeatmap(calendarData, personColor);
+        updateSummary(csvData, personName, personColor);
       });
 
       // Mouseout event - restore all bubbles
@@ -281,7 +282,9 @@ function createNameConnections(csvData, projection) {
           bubble.element.style("opacity", bubble.originalOpacity);
         });
 
+        // Reset calendar and summary to the original state
         createCalendarHeatmap(csvData);
+        updateSummary(csvData);
       });
     });
   }, 500);
