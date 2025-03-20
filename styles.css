@@ -281,17 +281,13 @@ svg {
 #summary-container {
   position: absolute;
   top: 20%;
-  left: 85%;
+  left: 84%;
+  right: 1%;
   width: 15%;
   height: auto;
   z-index: 10;
   pointer-events: none;
   background-color: rgba(26, 26, 26, 0.7);
-}
-
-.summary-box {
-  padding: 2px;
-  margin: 2px 2px;
 }
 
 .summary-columns {
