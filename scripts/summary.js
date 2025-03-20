@@ -1,11 +1,16 @@
 function updateSummary(csvData, personName = null, color = null) {
   let filteredData = csvData;
 
+  let instrument = "";
   // If personName is provided, filter the data for that person
   if (personName) {
     filteredData = csvData.filter(row =>
       row["full_name"] && row["full_name"].toLowerCase() === personName.toLowerCase()
     );
+    // Extract instrument_english from the first matching record (if found)
+    if (filteredData.length > 0) {
+      instrument = filteredData[0]["instrument_english"];
+    }
   }
 
   // Calculate summary statistics
@@ -63,8 +68,9 @@ function updateSummary(csvData, personName = null, color = null) {
 
     // Join with line breaks and set the content
     if (locationLines.length > 0) {
-      additionalInfoElement.innerHTML = `<strong>${personName}'s performances:</strong><br>` +
-                                      locationLines.join('<br>');
+      additionalInfoElement.innerHTML = `<strong>${personName}'s performance (${instrument ? 
+        `<span style="color:${numberColor}">${instrument}</span>` : 
+        'Unknown instrument'}):</strong><br>` + locationLines.join('<br>');
     } else {
       additionalInfoElement.textContent = `No location data available for ${personName}.`;
     }
