@@ -68,7 +68,7 @@ function updateSummary(csvData, personName = null, color = null) {
 
     // Join with line breaks and set the content
     if (locationLines.length > 0) {
-      additionalInfoElement.innerHTML = `<strong>${personName}'s performance (${instrument ? 
+      additionalInfoElement.innerHTML = `<strong>${personName}'s performances (${instrument ? 
         `<span style="color:${numberColor}">${instrument}</span>` : 
         'Unknown instrument'}):</strong><br>` + locationLines.join('<br>');
     } else {
