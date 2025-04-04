@@ -10,9 +10,81 @@ function drawMap(width, height, csvData) {
   // Get SVG element
   const svg = d3.select("#mapSvg");
 
+  // Make sure any previous content is cleared
+  svg.selectAll("g.zoom-controls").remove();
+
   // Create a group for the map with margins applied
   const mapGroup = svg.append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    .attr("transform", `translate(${margin.left}, ${margin.top})`)
+    .attr("id", "map-content"); // Add ID for zoom handling
+
+  // Set initial zoom state tracker
+  let isZoomed = false;
+  // Flag to track if we're in the original position or a reset state
+  let isInOriginalPosition = true;
+
+  // Create zoom behavior
+  const zoom = d3.zoom()
+    .scaleExtent([1, 8]) // Set minimum and maximum zoom levels
+    .on("zoom", handleZoom);
+
+  // Zoom event handler function (defined separately for clarity)
+  function handleZoom(event) {
+    // Update map transform
+    mapGroup.attr("transform", `translate(${event.transform.x}, ${event.transform.y}) scale(${event.transform.k})`);
+
+    // Check if we've moved from original position
+    if (isInOriginalPosition &&
+        (event.transform.x !== margin.left ||
+         event.transform.y !== margin.top ||
+         event.transform.k !== 1)) {
+      isInOriginalPosition = false;
+    }
+
+    // Toggle connections visibility based on zoom level
+    if (event.transform.k > 1.2 && !isZoomed) {
+      // Hide connections when zoomed in
+      d3.select("#connections-container").style("opacity", 0);
+      d3.select("#connections-svg").style("opacity", 0);
+      isZoomed = true;
+    } else if (event.transform.k <= 1.2 && isZoomed) {
+      // Only show connections if we're in reset state (after double click)
+      // Don't show just because we're zoomed out
+      if (isInOriginalPosition) {
+        d3.select("#connections-container").style("opacity", 1);
+        d3.select("#connections-svg").style("opacity", 1);
+      }
+      isZoomed = false;
+    }
+  }
+
+  // Precise reset function to ensure repeatability
+  function resetZoomExact() {
+    svg.transition()
+      .duration(750)
+      .call(zoom.transform, d3.zoomIdentity
+        .translate(margin.left, margin.top)
+        .scale(1))
+      .on("end", function() {
+        // Ensure proper state after animation finishes
+        isZoomed = false;
+        isInOriginalPosition = true;
+
+        // Explicitly force connections to be visible when reset to original position
+        d3.select("#connections-container").style("opacity", 1);
+        d3.select("#connections-svg").style("opacity", 1);
+      });
+  }
+
+  // Add zoom behavior to SVG element - with proper initialization
+  svg.call(zoom)
+     .on("dblclick.zoom", resetZoomExact);
+
+  // Initialize zoom transform to match initial margins
+  // This is critical to prevent the first zoom from being relative to 0,0
+  svg.call(zoom.transform, d3.zoomIdentity
+    .translate(margin.left, margin.top)
+    .scale(1));
 
   // Load world map data first
   d3.json("data/world.json")
@@ -73,7 +145,7 @@ function drawMap(width, height, csvData) {
         // Define bubble size scale
         const bubbleScale = d3.scaleSqrt()
           .domain([1, d3.max(cityData, d => d.count) || 10])
-          .range([4, 15]); // Min and max radius
+          .range([2, 6]); // Min and max radius
 
         // Add city bubbles
         const cities = mapGroup.selectAll(".city-bubble")
@@ -98,6 +170,13 @@ function drawMap(width, height, csvData) {
 
         createNameConnections(csvData, projection);
 
+        // Add zoom controls with reference to external CSS
+        addZoomControls(svg, zoom, width, height, resetZoomExact, margin);
+
+        // Ensure connections are initially visible
+        d3.select("#connections-container").style("opacity", 1);
+        d3.select("#connections-svg").style("opacity", 1);
+
       } catch (err) {
         console.error("Error processing CSV data:", err);
       }
@@ -106,6 +185,75 @@ function drawMap(width, height, csvData) {
     .catch(function(error) {
       console.error("Error loading world data:", error);
     });
+}
+
+// Function to add zoom controls - simplified with CSS
+function addZoomControls(svg, zoom, width, height, resetZoomExact, margin) {
+  // Position controls in the bottom left corner
+  const controlsGroup = svg.append("g")
+    .attr("class", "zoom-controls")
+    .attr("transform", `translate(20, 200)`); // Position near bottom
+
+  // Zoom in button
+  const zoomIn = controlsGroup.append("g")
+    .attr("class", "zoom-button zoom-in")
+    .style("cursor", "pointer")
+    .on("click", function() {
+      svg.transition()
+        .duration(300)
+        .call(zoom.scaleBy, 1.5);
+    });
+
+  zoomIn.append("rect")
+    .attr("width", 30)
+    .attr("height", 30)
+    .attr("rx", 5);
+
+  zoomIn.append("text")
+    .attr("x", 15)
+    .attr("y", 20)
+    .attr("text-anchor", "middle")
+    .text("+");
+
+  // Zoom out button
+  const zoomOut = controlsGroup.append("g")
+    .attr("class", "zoom-button zoom-out")
+    .attr("transform", "translate(0, 35)")
+    .style("cursor", "pointer")
+    .on("click", function() {
+      svg.transition()
+        .duration(300)
+        .call(zoom.scaleBy, 0.75);
+    });
+
+  zoomOut.append("rect")
+    .attr("width", 30)
+    .attr("height", 30)
+    .attr("rx", 5);
+
+  zoomOut.append("text")
+    .attr("x", 15)
+    .attr("y", 20)
+    .attr("text-anchor", "middle")
+    .text("−");
+
+  // Reset zoom button
+  const resetZoom = controlsGroup.append("g")
+    .attr("class", "zoom-button reset-zoom")
+    .attr("transform", "translate(0, 70)")
+    .style("cursor", "pointer")
+    .on("click", resetZoomExact);
+
+  resetZoom.append("rect")
+    .attr("width", 30)
+    .attr("height", 30)
+    .attr("rx", 5);
+
+  resetZoom.append("text")
+    .attr("x", 15)
+    .attr("y", 20)
+    .attr("text-anchor", "middle")
+    .text("⟲");
 }
 
 // Parse CSV data and convert to proper format

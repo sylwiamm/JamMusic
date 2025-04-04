@@ -321,3 +321,41 @@ svg {
   font-size: 12px;
   color: #FFFFFF;
 }
+
+/* Zoom controls styling */
+.zoom-controls {
+  opacity: 0.9;
+}
+
+.zoom-button rect {
+  fill: white;
+  stroke: #999;
+  stroke-width: 1;
+  fill-opacity: 0.8;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.zoom-button text {
+  font-size: 18px;
+  user-select: none;
+}
+
+.zoom-button:hover rect {
+  fill: #f0f0f0;
+  stroke: #666;
+}
+
+/* Reset zoom button has smaller text */
+.reset-zoom text {
+  font-size: 12px;
+}
+
+/* Add drop shadow for better visibility */
+.zoom-controls {
+  filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.2));
+}
+
+/* Connection visibility styles */
+#connections-container, #connections-svg {
+  transition: opacity 0.3s ease;
+}
